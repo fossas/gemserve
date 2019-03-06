@@ -30,7 +30,7 @@ type WithinRequest struct {
 	Spec    string
 }
 
-//go:generate go-bindata -o ../../bindata/bindata.go -pkg bindata ../../bindata
+//go:generate go-bindata -modtime 0 -o ../../bindata/bindata.go -pkg bindata ../../bindata/data
 
 func main() {
 	flag.Usage = func() {
@@ -111,7 +111,7 @@ Flags:
 	})
 
 	r.Get("/versions", func(w http.ResponseWriter, r *http.Request) {
-		fixtures, err := bindata.Asset("../../bindata/versions.json")
+		fixtures, err := bindata.Asset("../../bindata/data/versions.json")
 		if err != nil {
 			panic(err)
 		}
