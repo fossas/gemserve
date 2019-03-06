@@ -6,7 +6,7 @@ interview challenge.
 ## Installation
 
 Download from the GitHub Releases list. Use https://transfer.sh to download to
-a candidate's desktop.
+a candidate's computer.
 
 
 ## Running the server
