@@ -42,13 +42,45 @@ This HTTP server listens on three paths:
     Returns a JSON object whose key "versions" contains a list of (package name,
     package version) pairs.
 
+    Example output:
+
+    {
+      "versions": [
+        ["name", "1.0.0"],
+        ["name", "1.0.1"],
+        ["another name", "2.3.4"]
+      ]
+    }
+
   POST /compare
     Expects a JSON request body with two strings "a" and "b".
     Returns -1 if a < b, 0 if a == b, and 1 if a > b.
 
+    Example input:
+
+    {
+      "a": "1.0.0",
+      "b": "1.0.1"
+    }
+
+    Example output:
+
+    -1
+
   POST /within
     Expects a JSON request body with two strings "version" and "spec". Returns
     true if the version is within the spec, and false otherwise.
+
+    Example input:
+
+    {
+      "version": "1.0.2",
+      "spec": "^1.0.0"
+    }
+
+    Example output:
+
+    true
 
 Flags:
 
