@@ -2,8 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/Masterminds/semver"
@@ -30,6 +33,32 @@ type WithinRequest struct {
 //go:generate go-bindata -o ../../bindata/bindata.go -pkg bindata ../../bindata
 
 func main() {
+	flag.Usage = func() {
+		fmt.Printf(`%s is the test server for the Gems challenge.
+
+This HTTP server listens on three paths:
+
+  GET /versions
+    Returns a JSON object whose key "versions" contains a list of (package name,
+    package version) pairs.
+
+  POST /compare
+    Expects a JSON request body with two strings "a" and "b".
+    Returns -1 if a < b, 0 if a == b, and 1 if a > b.
+
+  POST /within
+    Expects a JSON request body with two strings "version" and "spec". Returns
+    true if the version is within the spec, and false otherwise.
+
+Flags:
+
+`, os.Args[0])
+		flag.PrintDefaults()
+	}
+
+	port := flag.Int("port", 8000, "the port to listen on")
+	flag.Parse()
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -95,5 +124,7 @@ func main() {
 
 	// r.Get("/manifests", func(w http.ResponseWriter, r *http.Request) {})
 
-	http.ListenAndServe(":3333", r)
+	p := strconv.Itoa(*port)
+	fmt.Printf("Listening to :%s\n", p)
+	http.ListenAndServe(":"+p, r)
 }
