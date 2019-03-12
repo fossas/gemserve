@@ -13,7 +13,7 @@ type Versions struct {
 	Versions [][]string
 }
 
-func TestVersions(t *testing.T) {
+func TestVersionsAreValidSemver(t *testing.T) {
 	fixtures, err := bindata.Asset("../../bindata/versions.json")
 	if err != nil {
 		t.Error(err)

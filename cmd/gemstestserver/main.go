@@ -40,17 +40,32 @@ This HTTP server listens on three paths:
 
   GET /versions
 
-    Returns a JSON object whose key "versions" contains a list of (package name,
-    package version) pairs.
+    Returns a JSON list containing a list of (package name, package version)
+    pairs.
+
+    Example output:
+
+      [
+        ["package", "1.0.0"],
+        ["package", "1.0.1"],
+        ["another-package", "2.3.4"]
+      ]
+
+  GET /manifests
+
+    Returns a JSON object containing package manifests.
 
     Example output:
 
       {
-        "versions": [
-          ["name", "1.0.0"],
-          ["name", "1.0.1"],
-          ["another name", "2.3.4"]
-        ]
+        "package": {
+          "a-direct-dependency": "~> 1.0.0",
+          "yet-another-package": "^2.3.4"
+        },
+        "another-package": {
+          "yet-another-package": ">= 2, < 4.0.0"
+        }
+        "yet-another-package": {}
       }
 
   POST /compare
@@ -157,7 +172,17 @@ Flags:
 		}
 	})
 
-	// r.Get("/manifests", func(w http.ResponseWriter, r *http.Request) {})
+	r.Get("/manifests", func(w http.ResponseWriter, r *http.Request) {
+		fixtures, err := bindata.Asset("../../bindata/data/manifests.json")
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = w.Write(fixtures)
+		if err != nil {
+			panic(err)
+		}
+	})
 
 	p := strconv.Itoa(*port)
 	fmt.Printf("Listening to :%s\n", p)
