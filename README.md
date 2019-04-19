@@ -1,4 +1,6 @@
 # gemstest
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffossas%2Fgemstest.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffossas%2Fgemstest?ref=badge_shield)
+
 
 `gemstest` provides files to support laptop-based implementation for the Gems
 interview challenge.
@@ -32,3 +34,7 @@ curl http://localhost:8000/versions
 Download a RubyGems database dump from https://rubygems.org/pages/data, and load
 it into the provided Docker container. Then run the Docker container with its
 PostgreSQL port exposed and run `gengems`.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffossas%2Fgemstest.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffossas%2Fgemstest?ref=badge_large)
