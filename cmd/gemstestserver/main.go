@@ -184,6 +184,13 @@ Flags:
 		}
 	})
 
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte("Hello! This is the FOSSA Gems test server."))
+		if err != nil {
+			panic(err)
+		}
+	})
+
 	p := strconv.Itoa(*port)
 	fmt.Printf("Listening to :%s\n", p)
 	http.ListenAndServe(":"+p, r)
