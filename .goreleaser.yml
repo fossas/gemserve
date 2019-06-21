@@ -1,10 +1,10 @@
 before:
   hooks:
     - go mod download
-    - go generate ./...
+    # - go generate ./...
 builds:
-  - main: ./cmd/gemstestserver
-    binary: gemstestserver
+  - main: ./cmd/gemserve
+    binary: gemserve
     goarch:
       - amd64
       - 386
