@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/Masterminds/semver"
 	"github.com/jmoiron/sqlx"
@@ -44,17 +45,12 @@ Usage:
 		flag.PrintDefaults()
 	}
 	pg := flag.String("pg", "postgresql://postgres@localhost:5432/rubygems?sslmode=disable", "postgres URL for RubyGems dump")
-	versionFile := flag.String("versionFile", "", "output JSON file for version pairs")
-	manifestFile := flag.String("manifestFile", "", "output JSON file for manifests")
+	dir := flag.String("dir", "", "output directory")
 	flag.Parse()
 
 	// Validate flags.
-	if *versionFile == "" {
+	if *dir == "" {
 		fmt.Println("flag -versionFile must not be empty")
-		os.Exit(1)
-	}
-	if *manifestFile == "" {
-		fmt.Println("flag -manifestFile must not be empty")
 		os.Exit(1)
 	}
 
@@ -90,7 +86,7 @@ Usage:
 	if err != nil {
 		panic(err)
 	}
-	err = ioutil.WriteFile(*versionFile, data, 0644)
+	err = ioutil.WriteFile(filepath.Join(*dir, "versions.json"), data, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -101,7 +97,7 @@ Usage:
 		panic(err)
 	}
 
-	manifests := make(map[string]map[string]string)
+	manifests := make(map[string]map[string]map[string]string)
 	for rows.Next() {
 		var name, version, dependency, spec, scope string
 		err := rows.Scan(&name, &version, &dependency, &spec, &scope)
@@ -121,16 +117,21 @@ Usage:
 			continue
 		}
 
-		manifest := manifests[name]
-		if manifest == nil {
-			manifests[name] = make(map[string]string)
-			manifest = manifests[name]
+		pkg := manifests[name]
+		if pkg == nil {
+			manifests[name] = make(map[string]map[string]string)
+			pkg = manifests[name]
 		}
-		manifest[dependency] = spec
+		deps := pkg[version]
+		if deps == nil {
+			pkg[version] = make(map[string]string)
+			deps = pkg[version]
+		}
+		deps[dependency] = spec
 	}
 
 	// Write manifests JSON file.
-	manifestFd, err := os.Create(*manifestFile)
+	manifestFd, err := os.Create(filepath.Join(*dir, "manifests.json"))
 	if err != nil {
 		panic(err)
 	}
@@ -138,6 +139,39 @@ Usage:
 	enc.SetEscapeHTML(false) // See https://stackoverflow.com/questions/28595664/how-to-stop-json-marshal-from-escaping-and
 	enc.SetIndent("", "  ")
 	err = enc.Encode(manifests)
+	if err != nil {
+		panic(err)
+	}
+
+	// Generate manifest snapshot using the dependencies of the latest version for
+	// each package. This snapshot is NOT guaranteed to have a resolvable graph
+	// for any packages.
+	snapshot := make(map[string]map[string]string)
+	for pkg, versions := range manifests {
+		latestVersion := &semver.Version{}
+		latestDeps := make(map[string]string)
+		for version, deps := range versions {
+			v, err := semver.NewVersion(version)
+			if err != nil {
+				panic(err)
+			}
+			if v.GreaterThan(latestVersion) {
+				latestVersion = v
+				latestDeps = deps
+			}
+		}
+		snapshot[pkg] = latestDeps
+	}
+
+	// Write snapshots JSON file.
+	snapshotFd, err := os.Create(filepath.Join(*dir, "snapshot.json"))
+	if err != nil {
+		panic(err)
+	}
+	enc = json.NewEncoder(snapshotFd)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	err = enc.Encode(snapshot)
 	if err != nil {
 		panic(err)
 	}
