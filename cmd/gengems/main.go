@@ -118,6 +118,7 @@ Usage:
 		_, err = semver.NewConstraint(spec)
 		if err != nil {
 			fmt.Printf("Ignoring bad spec: %s %s depends on %s %s (%s)\n", name, version, dependency, spec, scope)
+			continue
 		}
 
 		manifest := manifests[name]
