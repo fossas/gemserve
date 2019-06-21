@@ -44,7 +44,7 @@ Example output:
   },
   "another-package": {
     "yet-another-package": ">= 2, < 4.0.0"
-  }
+  },
   "yet-another-package": {}
 }
 ```

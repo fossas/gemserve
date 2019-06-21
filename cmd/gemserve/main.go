@@ -64,7 +64,7 @@ This HTTP server listens on three paths:
         },
         "another-package": {
           "yet-another-package": ">= 2, < 4.0.0"
-        }
+        },
         "yet-another-package": {}
       }
 
@@ -173,6 +173,18 @@ Flags:
 	})
 
 	r.Get("/manifests", func(w http.ResponseWriter, r *http.Request) {
+		fixtures, err := bindata.Asset("../../bindata/data/snapshot.json")
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = w.Write(fixtures)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	r.Get("/challenge", func(w http.ResponseWriter, r *http.Request) {
 		fixtures, err := bindata.Asset("../../bindata/data/manifests.json")
 		if err != nil {
 			panic(err)

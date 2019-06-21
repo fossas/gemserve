@@ -31,19 +31,19 @@ func TestVersionsAreValidSemver(t *testing.T) {
 	}
 }
 
-func TestManifestsUseValidSpecs(t *testing.T) {
-	fixtures, err := bindata.Asset("../../bindata/data/manifests.json")
+func TestSnapshotUsesValidSpecs(t *testing.T) {
+	fixtures, err := bindata.Asset("../../bindata/data/snapshot.json")
 	if err != nil {
 		t.Error(err)
 	}
 
-	var manifests map[string]map[string]string
-	err = json.Unmarshal(fixtures, &manifests)
+	var snapshot map[string]map[string]string
+	err = json.Unmarshal(fixtures, &snapshot)
 	if err != nil {
 		t.Error(err)
 	}
 
-	for pkg, specs := range manifests {
+	for pkg, specs := range snapshot {
 		for dep, spec := range specs {
 			_, err := semver.NewConstraint(spec)
 			if err != nil {
