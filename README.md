@@ -106,6 +106,7 @@ docker run -p 5432:5432 -it gemserve
 ./load-pg-dump -c gems.tar
 
 # Outside of container, while container is still running
-gengems -manifestFile ./bindata/data/manifests.json -versionFile ./bindata/data/versions.json > gengems.log
+mkdir -p ./bindata/data
+gengems -dir ./bindata/data > /tmp/gengems.log
 go install ./...
 ```
